@@ -54,13 +54,13 @@ def run_pipeline(
     # Görsel için orta slice
     z_mid = ed_vol.shape[2] // 2
 
-    # ✅ çıktı klasörü GERÇEK ID ile kalmalı
+    # çıktı klasörü GERÇEK ID ile kalmalı
     ed_overlay_path = paths.out_dir / patient_id / "ed_overlay.png"
     es_overlay_path = paths.out_dir / patient_id / "es_overlay.png"
     save_overlay_png(ed_vol[..., z_mid], ed_mask[..., z_mid], ed_overlay_path, title=f"{patient_id} ED overlay")
     save_overlay_png(es_vol[..., z_mid], es_mask[..., z_mid], es_overlay_path, title=f"{patient_id} ES overlay")
 
-    # ✅ UI etiketi: display varsa onu göster
+    # UI etiketi: display varsa onu göster
     shown_id = display_patient_id or patient_id
 
     return {

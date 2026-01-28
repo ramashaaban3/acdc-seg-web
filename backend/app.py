@@ -3,12 +3,25 @@ from typing import Any, Dict, List
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 
 from acdc_app.run_pipeline import run_pipeline, PipelinePaths
 from acdc_app.pipeline.inference import InferenceConfig
 from acdc_app.pipeline.data_io import list_patients
 
+
 app = FastAPI(title="ACDC Segmentation API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- Proje yolları ---
 BACKEND_ROOT = Path(__file__).resolve().parent          # backend/
@@ -24,6 +37,20 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 app.mount("/outputs", StaticFiles(directory=str(OUT_DIR)), name="outputs")
 
 
+def _ensure_ready() -> None:
+    """Demo klasörü ve checkpoint gibi kritik bağımlılıkları kontrol et."""
+    if not DEMO_ROOT.exists():
+        raise HTTPException(
+            status_code=500,
+            detail=f"Demo root not found: {DEMO_ROOT} (backend/data/demo klasörünü oluşturup patient klasörlerini koymalısın.)",
+        )
+    if not CKPT_PATH.exists():
+        raise HTTPException(
+            status_code=500,
+            detail=f"Checkpoint not found: {CKPT_PATH} (best_resunet2d_acdc.pt dosyasını backend/models içine koymalısın.)",
+        )
+
+
 @app.get("/")
 def root():
     return {"ok": True, "endpoints": ["/patients", "/predict?patient_id=patient101"]}
@@ -34,7 +61,10 @@ def patients() -> List[Dict[str, str]]:
     """
     UI tarafı için: Patient 1..N isimleri + gerçek id
     """
+    _ensure_ready()
     pids = sorted(list_patients(DEMO_ROOT))
+    if not pids:
+        raise HTTPException(status_code=500, detail=f"No patients found under: {DEMO_ROOT}")
     return [{"patient_id": f"Patient {i+1}", "real_patient_id": pid} for i, pid in enumerate(pids)]
 
 
@@ -43,9 +73,7 @@ def predict(
     request: Request,
     patient_id: str = Query(..., description="real id: patient101 OR display id: Patient 1"),
 ) -> Dict[str, Any]:
-
-    if not CKPT_PATH.exists():
-        raise HTTPException(status_code=500, detail=f"Checkpoint not found: {CKPT_PATH}")
+    _ensure_ready()
 
     pids = sorted(list_patients(DEMO_ROOT))
     if not pids:
