@@ -1,37 +1,50 @@
-🫀 ACDC Cardiac MRI Segmentation Web Application
-Web-based application for cardiac MRI segmentation and functional parameter estimation (EDV, ESV, EF) using deep learning models, FastAPI backend, and React (Vite) frontend.
-Based on the ACDC (MICCAI 2017) dataset.
+# 🫀 ACDC Cardiac MRI Segmentation Web Application
 
-This repository is a personal fork of the original project for individual contributions and portfolio purposes.
+Web-based application for cardiac MRI segmentation and functional parameter estimation (EDV, ESV, EF) using deep learning models, FastAPI backend, and React (Vite) frontend.  
+Based on the **ACDC (MICCAI 2017) dataset**.
 
-📌 Project Overview
+> This repository is a personal fork of the original project for individual contributions and portfolio purposes.
+
+---
+
+## 📌 Project Overview
+
 This project provides an end-to-end pipeline for:
 
-Automatic segmentation of:
-Left Ventricle (LV)
-Right Ventricle (RV)
-Myocardium (MYO)
-Estimation of cardiac functional parameters:
-End-Diastolic Volume (EDV)
-End-Systolic Volume (ESV)
-Ejection Fraction (EF)
-Visualization of segmentation overlays in a web interface
+- Automatic segmentation of:
+  - Left Ventricle (LV)
+  - Right Ventricle (RV)
+  - Myocardium (MYO)
+- Estimation of cardiac functional parameters:
+  - End-Diastolic Volume (EDV)
+  - End-Systolic Volume (ESV)
+  - Ejection Fraction (EF)
+- Visualization of segmentation overlays in a web interface
+
 The system consists of a FastAPI-based backend that performs model inference and a React-based frontend that allows users to interactively view results.
 
-📌 Proje Özeti
+---
+
+## 📌 Proje Özeti (Türkçe)
+
 Bu proje, kalp MR görüntülerinin derin öğrenme tabanlı otomatik bölütlenmesi ve fonksiyonel kardiyak parametrelerin hesaplanması için uçtan uca bir sistem sunmaktadır.
 
 Sistem şu işlemleri gerçekleştirmektedir:
 
-Sol ventrikül (LV), sağ ventrikül (RV) ve miyokard (MYO) bölütlemesi
-Kardiyak fonksiyonel parametrelerin hesaplanması:
-Diyastol Sonu Hacim (EDV)
-Sistol Sonu Hacim (ESV)
-Ejeksiyon Fraksiyonu (EF)
-Web arayüzü üzerinden segmentasyon çıktılarının görselleştirilmesi
+- Sol ventrikül (LV), sağ ventrikül (RV) ve miyokard (MYO) bölütlemesi
+- Kardiyak fonksiyonel parametrelerin hesaplanması:
+  - Diyastol Sonu Hacim (EDV)
+  - Sistol Sonu Hacim (ESV)
+  - Ejeksiyon Fraksiyonu (EF)
+- Web arayüzü üzerinden segmentasyon çıktılarının görselleştirilmesi
+
 Backend FastAPI ile, frontend ise React (Vite) kullanılarak geliştirilmiştir.
 
-🏗 System Architecture
+---
+
+## 🏗 System Architecture
+
+```text
 Frontend (React + Vite)
         |
         | HTTP API Requests
@@ -44,6 +57,7 @@ Deep Learning Segmentation Model
         |
         v
 Overlay Images + EDV/ESV/EF Results
+
 
 Model & Dataset
 Dataset
