@@ -25,7 +25,7 @@ The system consists of a FastAPI-based backend that performs model inference and
 
 ---
 
-## 📌 Proje Özeti (Türkçe)
+## 📌 Proje Özeti
 
 Bu proje, kalp MR görüntülerinin derin öğrenme tabanlı otomatik bölütlenmesi ve fonksiyonel kardiyak parametrelerin hesaplanması için uçtan uca bir sistem sunmaktadır.
 
