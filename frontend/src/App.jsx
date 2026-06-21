@@ -1,18 +1,105 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  AppBar, Toolbar, Typography, Container, Grid, Card, CardContent,
-  Stack, Button, FormControl, InputLabel, Select, MenuItem,
-  Alert, CircularProgress, ToggleButtonGroup, ToggleButton, Chip, Box
+  AppBar,
+  Toolbar,
+  Typography,
+  Container,
+  Grid,
+  Card,
+  CardContent,
+  Stack,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  CircularProgress,
+  ToggleButtonGroup,
+  ToggleButton,
+  Chip,
+  Box,
+  TextField,
+  Divider,
 } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import { getPatients, runPredict } from "./api";
+
+import { getPatients, askVqa } from "./api";
 import MetricCard from "./components/MetricCard";
 import OverlayPanel from "./components/OverlayPanel";
+
+
+const SEGMENTATION_MODEL_OPTIONS = [
+  {
+    label: "3D U-Net",
+    value: "3d_unet",
+    status: "active",
+  },
+  {
+    label: "2D ResU-Net",
+    value: "2d_resunet",
+    status: "coming_soon",
+  },
+  {
+    label: "3D ResU-Net",
+    value: "3d_resunet",
+    status: "coming_soon",
+  },
+];
+
+
+const LLM_MODEL_OPTIONS = [
+  {
+    label: "GPT-4o-mini",
+    value: "gpt-4o-mini",
+    provider: "openai",
+    status: "active",
+  },
+  {
+    label: "Qwen3-8B-Instruct",
+    value: "qwen3-8b-instruct",
+    provider: "qwen",
+    status: "comparison",
+  },
+];
+
+
+const SAMPLE_QUESTIONS = [
+  "Bu hastanın EF değeri kaç?",
+  "EDV ve ESV değerleri nedir?",
+  "Bu sonuçları klinik olarak yorumlar mısın?",
+  "Tahmin hatası yüksek mi?",
+  "Sol ventrikül dilate mi?",
+  "B planı düzeltmesi uygulanmış mı?",
+];
+
+
+function toFixedOrDash(value, ndigits = 2) {
+  if (value === null || value === undefined || value === "") {
+    return "—";
+  }
+
+  const numberValue = Number(value);
+
+  if (Number.isNaN(numberValue)) {
+    return "—";
+  }
+
+  return numberValue.toFixed(ndigits);
+}
+
 
 export default function App() {
   const [patients, setPatients] = useState([]);
   const [selected, setSelected] = useState("");
-  const [phase, setPhase] = useState("ED"); // ED / ES
+
+  // Default seçimler
+  const [selectedSegmentationModel, setSelectedSegmentationModel] = useState("3d_unet");
+  const [selectedLlmModel, setSelectedLlmModel] = useState("gpt-4o-mini");
+
+  const [question, setQuestion] = useState("Bu sonuçları klinik olarak yorumlar mısın?");
+  const [phase, setPhase] = useState("ED");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,59 +110,129 @@ export default function App() {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getPatients(); // beklenen: [{patient_id, real_patient_id}] veya benzeri
+        const data = await getPatients();
+
         setPatients(data);
 
-        // Eğer backend şu an [] döndürüyorsa, UI boş kalmasın diye:
-        // demo fallback (istersen kaldır)
-        if (!data?.length) {
-          setPatients([{ patient_id: "Patient 1", real_patient_id: "patient101" }]);
+        if (data?.length) {
+          setSelected(data[0].real_patient_id || data[0].patient_id);
+        } else {
+          setPatients([{ patient_id: "patient100", real_patient_id: "patient100" }]);
+          setSelected("patient100");
         }
       } catch (e) {
         setError("Backend’e bağlanılamadı. API çalışıyor mu? /docs açılıyor mu?");
+
+        // Demo fallback
+        setPatients([{ patient_id: "patient100", real_patient_id: "patient100" }]);
+        setSelected("patient100");
       }
     })();
   }, []);
 
   const selectedId = useMemo(() => {
-    // backend’in döndürdüğü yapıya göre seçimi normalize et
-    // kullanıcı Patient 1 seçse de real id ile predict çağıracağız
-    const p = patients.find(x => x.patient_id === selected || x.real_patient_id === selected);
+    const p = patients.find(
+      (x) => x.patient_id === selected || x.real_patient_id === selected
+    );
+
     return p?.real_patient_id || selected || "";
   }, [patients, selected]);
 
-  async function onRun() {
+  const selectedSegmentationInfo = useMemo(() => {
+    return (
+      SEGMENTATION_MODEL_OPTIONS.find((m) => m.value === selectedSegmentationModel) ||
+      SEGMENTATION_MODEL_OPTIONS[0]
+    );
+  }, [selectedSegmentationModel]);
+
+  const selectedLlmInfo = useMemo(() => {
+    return (
+      LLM_MODEL_OPTIONS.find((m) => m.value === selectedLlmModel) ||
+      LLM_MODEL_OPTIONS[0]
+    );
+  }, [selectedLlmModel]);
+
+  function toAbsUrl(url) {
+    if (!url) {
+      return null;
+    }
+
+    if (/^https?:\/\//i.test(url)) {
+      return url;
+    }
+
+    const base = (apiBase || "").replace(/\/$/, "");
+    const path = url.startsWith("/") ? url : `/${url}`;
+
+    return `${base}${path}`;
+  }
+
+  async function onAskVqa() {
     setError("");
     setLoading(true);
-    setResult(null);
 
     try {
-      if (!selectedId) throw new Error("Hasta seçilmedi.");
+      if (!selectedId) {
+        throw new Error("Hasta seçilmedi.");
+      }
 
-      const data = await runPredict(selectedId);
+      if (!question.trim()) {
+        throw new Error("Lütfen bir soru yaz.");
+      }
 
-      // 1) Buraya log ekle
-      console.log("PREDICT RESPONSE:", data);
+      const data = await askVqa({
+        patientId: selectedId,
+        question: question.trim(),
+        segmentationModel: selectedSegmentationModel || "3d_unet",
+        llmProvider: selectedLlmInfo.provider || "openai",
+        llmModel: selectedLlmInfo.value || "gpt-4o-mini",
+      });
+
+      console.log("VQA RESPONSE:", data);
       console.log("VITE_API_BASE:", apiBase);
 
-      // 2) URL düzeltme: absolute ise olduğu gibi kullan, relative ise base ekle
-      const toAbs = (u) => {
-        if (!u) return null;
-        if (/^https?:\/\//i.test(u)) return u; // zaten tam URL
-        const base = (apiBase || "").replace(/\/$/, "");
-        const path = u.startsWith("/") ? u : `/${u}`;
-        return `${base}${path}`;
-      };
+      const prediction = data?.clinical_metrics?.prediction || {};
+      const reference = data?.clinical_metrics?.reference || {};
+      const errors = data?.clinical_metrics?.absolute_errors || {};
+      const artifacts = data?.artifacts || {};
+      const ui = data?.ui || {};
 
       setResult({
-        edv: data.edv_ml,
-        esv: data.esv_ml,
-        ef: data.ef_percent,
-        edImg: toAbs(data.ed_overlay_url),
-        esImg: toAbs(data.es_overlay_url),
+        raw: data,
+
+        answer: data?.response?.answer || "",
+        answerType: data?.response?.answer_type || data?.question_type || "",
+        confidence: data?.response?.confidence || "",
+        limitations: data?.response?.limitations || ui?.warning || "",
+
+        segmentationModel: data?.segmentation_model || selectedSegmentationModel,
+        llmProvider: data?.llm_provider || selectedLlmInfo.provider,
+        llmModel: data?.llm_model || selectedLlmInfo.value,
+
+        edv: prediction.edv_ml,
+        esv: prediction.esv_ml,
+        ef: prediction.ef_percent,
+
+        refEdv: reference.edv_ml,
+        refEsv: reference.esv_ml,
+        refEf: reference.ef_percent,
+
+        edvError: errors.edv_ml,
+        esvError: errors.esv_ml,
+        efError: errors.ef_percent,
+
+        qualityControl: data?.quality_control || {},
+        phaseInfo: data?.phase_info || {},
+
+        edImg: toAbsUrl(artifacts.overlay_ed_url),
+        esImg: toAbsUrl(artifacts.overlay_es_url),
       });
     } catch (e) {
-      setError(e?.response?.data?.detail || e.message || "Predict sırasında hata oluştu.");
+      setError(
+        e?.response?.data?.detail ||
+          e.message ||
+          "VQA sırasında hata oluştu."
+      );
     } finally {
       setLoading(false);
     }
@@ -83,7 +240,6 @@ export default function App() {
 
   const year = new Date().getFullYear();
 
-  // 2) Daha canlı demo: Indigo/Navy → Cyan/Teal vurgu + hafif glow
   const barBg =
     "linear-gradient(90deg, rgba(7,12,26,0.96) 0%, rgba(2,34,64,0.94) 45%, rgba(0,120,170,0.92) 100%)";
 
@@ -119,46 +275,60 @@ export default function App() {
         <Toolbar sx={{ gap: 1.25 }}>
           <Stack>
             <Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: 0.2 }}>
-              ACDC Cardiac MRI Segmentation
+              ACDC Cardiac MRI VQA System
             </Typography>
+
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.82)" }}>
-              2D ResUNet • EDV/ESV/EF hesaplama • Overlay çıktısı
+              3D U-Net Clinical Metrics • GPT-4o-mini LLM Interpretation • Qwen3-8B Comparison Ready
             </Typography>
           </Stack>
         </Toolbar>
       </AppBar>
 
-      {/* İçerik alanı büyüsün, footer aşağı itilsin */}
       <Box component="main" sx={{ flex: "1 0 auto" }}>
         <Container maxWidth="lg" sx={{ py: 4 }}>
           <Grid container spacing={3}>
-            {/* METRICS */}
+            {/* METRIC CARDS */}
             <Grid item xs={12}>
               <Grid container spacing={2} sx={{ alignItems: "stretch" }}>
                 <Grid item xs={12} md={4}>
                   <Box sx={{ height: 110 }}>
-                    <MetricCard title="EDV" value={result?.edv?.toFixed?.(2)} unit="ml" />
+                    <MetricCard
+                      title="EDV"
+                      value={toFixedOrDash(result?.edv)}
+                      unit={result?.edv != null ? "ml" : ""}
+                    />
                   </Box>
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <Box sx={{ height: 110 }}>
-                    <MetricCard title="ESV" value={result?.esv?.toFixed?.(2)} unit="ml" />
+                    <MetricCard
+                      title="ESV"
+                      value={toFixedOrDash(result?.esv)}
+                      unit={result?.esv != null ? "ml" : ""}
+                    />
                   </Box>
                 </Grid>
+
                 <Grid item xs={12} md={4}>
                   <Box sx={{ height: 110 }}>
-                    <MetricCard title="EF" value={result?.ef?.toFixed?.(2)} unit="%" />
+                    <MetricCard
+                      title="EF"
+                      value={toFixedOrDash(result?.ef)}
+                      unit={result?.ef != null ? "%" : ""}
+                    />
                   </Box>
                 </Grid>
               </Grid>
             </Grid>
 
-            {/* LEFT PANEL */}
+            {/* LEFT CONTROL PANEL */}
             <Grid item xs={12} md={4}>
               <Card
                 variant="outlined"
                 sx={{
-                  backgroundColor: "rgba(255,255,255,0.85)",
+                  backgroundColor: "rgba(255,255,255,0.88)",
                   backdropFilter: "blur(6px)",
                   WebkitBackdropFilter: "blur(10px)",
                   boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
@@ -167,7 +337,9 @@ export default function App() {
               >
                 <CardContent>
                   <Stack spacing={2}>
-                    <Typography variant="h6">Çalıştırma Paneli</Typography>
+                    <Typography variant="h6" fontWeight={800}>
+                      Cardiac MRI VQA Panel
+                    </Typography>
 
                     <FormControl fullWidth>
                       <InputLabel>Hasta</InputLabel>
@@ -177,16 +349,87 @@ export default function App() {
                         onChange={(e) => setSelected(e.target.value)}
                       >
                         {patients.map((p) => (
-                          <MenuItem key={p.real_patient_id || p.patient_id} value={p.real_patient_id || p.patient_id}>
+                          <MenuItem
+                            key={p.real_patient_id || p.patient_id}
+                            value={p.real_patient_id || p.patient_id}
+                          >
                             {p.patient_id || p.real_patient_id}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
 
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography variant="body2" color="text.secondary">Model:</Typography>
-                      <Chip size="small" label="ResUNet2D" />
+                    <FormControl fullWidth>
+                      <InputLabel>Segmentation Model</InputLabel>
+                      <Select
+                        value={selectedSegmentationModel}
+                        label="Segmentation Model"
+                        onChange={(e) => setSelectedSegmentationModel(e.target.value)}
+                      >
+                        {SEGMENTATION_MODEL_OPTIONS.map((m) => (
+                          <MenuItem
+                            key={m.value}
+                            value={m.value}
+                            disabled={m.status === "coming_soon"}
+                          >
+                            {m.label}
+                            {m.status === "coming_soon" ? " — yakında" : ""}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <FormControl fullWidth>
+                      <InputLabel>LLM Model</InputLabel>
+                      <Select
+                        value={selectedLlmModel}
+                        label="LLM Model"
+                        onChange={(e) => setSelectedLlmModel(e.target.value)}
+                      >
+                        {LLM_MODEL_OPTIONS.map((m) => (
+                          <MenuItem key={m.value} value={m.value}>
+                            {m.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+
+                    <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                      <Typography variant="body2" color="text.secondary">
+                        Aktif:
+                      </Typography>
+
+                      <Chip size="small" label={selectedSegmentationInfo.label} />
+                      <Chip size="small" label={selectedLlmInfo.label} color="primary" />
+                    </Stack>
+
+                    <TextField
+                      label="Klinik soru"
+                      multiline
+                      minRows={3}
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      fullWidth
+                      placeholder="Örn: Bu sonuçları klinik olarak yorumlar mısın?"
+                    />
+
+                    <Stack spacing={1}>
+                      <Typography variant="body2" color="text.secondary">
+                        Örnek sorular
+                      </Typography>
+
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {SAMPLE_QUESTIONS.map((q) => (
+                          <Chip
+                            key={q}
+                            label={q}
+                            size="small"
+                            variant="outlined"
+                            onClick={() => setQuestion(q)}
+                            sx={{ cursor: "pointer" }}
+                          />
+                        ))}
+                      </Stack>
                     </Stack>
 
                     <Button
@@ -194,29 +437,130 @@ export default function App() {
                       variant="contained"
                       startIcon={loading ? <CircularProgress size={18} /> : <PlayArrowIcon />}
                       disabled={loading || !selectedId}
-                      onClick={onRun}
+                      onClick={onAskVqa}
                     >
-                      {loading ? "Çalışıyor..." : "Run Segmentation"}
+                      {loading ? "LLM yanıtlıyor..." : "Ask VQA"}
                     </Button>
 
                     {error && <Alert severity="error">{String(error)}</Alert>}
 
-                    <Alert
-                      severity="info"
-                      sx={{
-                        visibility: "hidden", // görünmez ama yer kaplar
-                      }}
-                    >
-                      Backend açık değilse sonuçlar gelmez. API: <b>{apiBase}</b>
+                    <Alert severity="info">
+                      Default: <b>3D U-Net + GPT-4o-mini</b>
+                      <br />
+                      API: <b>{apiBase}</b>
                     </Alert>
                   </Stack>
                 </CardContent>
               </Card>
             </Grid>
 
-            {/* RIGHT PANEL */}
+            {/* RIGHT MAIN PANEL */}
             <Grid item xs={12} md={8}>
               <Stack spacing={2}>
+                {/* LLM ANSWER PANEL */}
+                <Card
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "rgba(255,255,255,0.88)",
+                    backdropFilter: "blur(6px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.18)",
+                    borderColor: "rgba(255,255,255,0.7)",
+                  }}
+                >
+                  <CardContent>
+                    <Stack spacing={1.5}>
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        justifyContent="space-between"
+                        spacing={1}
+                      >
+                        <Typography variant="h6" fontWeight={800}>
+                          LLM Clinical Answer
+                        </Typography>
+
+                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                          {result?.answerType && (
+                            <Chip size="small" label={result.answerType} />
+                          )}
+
+                          {result?.confidence && (
+                            <Chip
+                              size="small"
+                              color="primary"
+                              label={`confidence: ${result.confidence}`}
+                            />
+                          )}
+
+                          {result?.segmentationModel && (
+                            <Chip
+                              size="small"
+                              variant="outlined"
+                              label={result.segmentationModel}
+                            />
+                          )}
+
+                          {result?.llmModel && (
+                            <Chip
+                              size="small"
+                              variant="outlined"
+                              label={result.llmModel}
+                            />
+                          )}
+                        </Stack>
+                      </Stack>
+
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          minHeight: 72,
+                          color: result?.answer ? "text.primary" : "text.secondary",
+                          lineHeight: 1.65,
+                        }}
+                      >
+                        {result?.answer || "LLM cevabı burada görünecek."}
+                      </Typography>
+
+                      {result?.limitations && (
+                        <Alert severity="warning">{result.limitations}</Alert>
+                      )}
+
+                      {result && (
+                        <>
+                          <Divider />
+
+                          <Grid container spacing={1.5}>
+                            <Grid item xs={12} md={4}>
+                              <MetricCard
+                                title="EDV Error"
+                                value={toFixedOrDash(result.edvError)}
+                                unit={result.edvError != null ? "ml" : ""}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} md={4}>
+                              <MetricCard
+                                title="ESV Error"
+                                value={toFixedOrDash(result.esvError)}
+                                unit={result.esvError != null ? "ml" : ""}
+                              />
+                            </Grid>
+
+                            <Grid item xs={12} md={4}>
+                              <MetricCard
+                                title="EF Error"
+                                value={toFixedOrDash(result.efError)}
+                                unit={result.efError != null ? "pp" : ""}
+                              />
+                            </Grid>
+                          </Grid>
+                        </>
+                      )}
+                    </Stack>
+                  </CardContent>
+                </Card>
+
+                {/* OVERLAY HEADER */}
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Box
                     sx={{
@@ -274,10 +618,13 @@ export default function App() {
                   </Box>
                 </Stack>
 
-                {/* Görsel gelmeden önce alanı rezerve et → kaymayı azaltır */}
                 <Box sx={{ minHeight: 520 }}>
                   <OverlayPanel
-                    title={phase === "ED" ? "End-Diastole (ED) Overlay" : "End-Systole (ES) Overlay"}
+                    title={
+                      phase === "ED"
+                        ? "End-Diastole (ED) Overlay"
+                        : "End-Systole (ES) Overlay"
+                    }
                     imgUrl={phase === "ED" ? result?.edImg : result?.esImg}
                   />
                 </Box>
@@ -287,7 +634,6 @@ export default function App() {
         </Container>
       </Box>
 
-      {/* FOOTER */}
       <Box
         component="footer"
         sx={{
@@ -320,7 +666,7 @@ export default function App() {
             alignItems={{ xs: "flex-start", sm: "center" }}
           >
             <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.92)" }}>
-              ACDC veri kümesi üzerinde kardiyak MR bölütleme ve EDV/ESV/EF hesaplama için geliştirilmiş akademik demo uygulaması.
+              ACDC veri kümesi üzerinde kardiyak MR segmentasyon, klinik metrik çıkarımı ve LLM tabanlı VQA için geliştirilmiş akademik demo uygulaması.
             </Typography>
 
             <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.72)" }}>

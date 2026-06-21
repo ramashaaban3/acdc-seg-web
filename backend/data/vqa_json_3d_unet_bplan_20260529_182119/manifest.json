@@ -1,0 +1,709 @@
+{
+  "schema_version": "1.0",
+  "model_name": "3D U-Net",
+  "dataset_name": "ACDC",
+  "n_patients": 100,
+  "summary_path": "summary_3d_unet.json",
+  "patients": [
+    {
+      "patient_id": "patient001",
+      "json_path": "patients/patient001_result.json",
+      "ef_percent": 19.417178,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient002",
+      "json_path": "patients/patient002_result.json",
+      "ef_percent": 27.14767,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient003",
+      "json_path": "patients/patient003_result.json",
+      "ef_percent": 10.141185,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient004",
+      "json_path": "patients/patient004_result.json",
+      "ef_percent": 14.175978,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient005",
+      "json_path": "patients/patient005_result.json",
+      "ef_percent": 23.574667,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient006",
+      "json_path": "patients/patient006_result.json",
+      "ef_percent": 15.334229,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient007",
+      "json_path": "patients/patient007_result.json",
+      "ef_percent": 10.817884,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient008",
+      "json_path": "patients/patient008_result.json",
+      "ef_percent": 15.324459,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient009",
+      "json_path": "patients/patient009_result.json",
+      "ef_percent": 12.785891,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient010",
+      "json_path": "patients/patient010_result.json",
+      "ef_percent": 11.124922,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient011",
+      "json_path": "patients/patient011_result.json",
+      "ef_percent": 13.052706,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient012",
+      "json_path": "patients/patient012_result.json",
+      "ef_percent": 30.295039,
+      "error_flag": "high",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient013",
+      "json_path": "patients/patient013_result.json",
+      "ef_percent": 27.513146,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient014",
+      "json_path": "patients/patient014_result.json",
+      "ef_percent": 18.05255,
+      "error_flag": "high",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient015",
+      "json_path": "patients/patient015_result.json",
+      "ef_percent": 31.818182,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient016",
+      "json_path": "patients/patient016_result.json",
+      "ef_percent": 9.408045,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient017",
+      "json_path": "patients/patient017_result.json",
+      "ef_percent": 12.181647,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient018",
+      "json_path": "patients/patient018_result.json",
+      "ef_percent": 23.850467,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient019",
+      "json_path": "patients/patient019_result.json",
+      "ef_percent": 26.600496,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient020",
+      "json_path": "patients/patient020_result.json",
+      "ef_percent": 17.489768,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient021",
+      "json_path": "patients/patient021_result.json",
+      "ef_percent": 60.848035,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient022",
+      "json_path": "patients/patient022_result.json",
+      "ef_percent": 64.819796,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient023",
+      "json_path": "patients/patient023_result.json",
+      "ef_percent": 69.18304,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient024",
+      "json_path": "patients/patient024_result.json",
+      "ef_percent": 71.940727,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient025",
+      "json_path": "patients/patient025_result.json",
+      "ef_percent": 64.963968,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient026",
+      "json_path": "patients/patient026_result.json",
+      "ef_percent": 45.777351,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient027",
+      "json_path": "patients/patient027_result.json",
+      "ef_percent": 71.694696,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient028",
+      "json_path": "patients/patient028_result.json",
+      "ef_percent": 68.784029,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient029",
+      "json_path": "patients/patient029_result.json",
+      "ef_percent": 74.718972,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient030",
+      "json_path": "patients/patient030_result.json",
+      "ef_percent": 85.868587,
+      "error_flag": "high",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient031",
+      "json_path": "patients/patient031_result.json",
+      "ef_percent": 68.389709,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient032",
+      "json_path": "patients/patient032_result.json",
+      "ef_percent": 81.122746,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient033",
+      "json_path": "patients/patient033_result.json",
+      "ef_percent": 73.000306,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient034",
+      "json_path": "patients/patient034_result.json",
+      "ef_percent": 75.488,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient035",
+      "json_path": "patients/patient035_result.json",
+      "ef_percent": 62.204103,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient036",
+      "json_path": "patients/patient036_result.json",
+      "ef_percent": 57.975732,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient037",
+      "json_path": "patients/patient037_result.json",
+      "ef_percent": 62.742981,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient038",
+      "json_path": "patients/patient038_result.json",
+      "ef_percent": 54.0337,
+      "error_flag": "low",
+      "has_crop_risk": true
+    },
+    {
+      "patient_id": "patient039",
+      "json_path": "patients/patient039_result.json",
+      "ef_percent": 71.806798,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient040",
+      "json_path": "patients/patient040_result.json",
+      "ef_percent": 48.601096,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient041",
+      "json_path": "patients/patient041_result.json",
+      "ef_percent": 38.24228,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient042",
+      "json_path": "patients/patient042_result.json",
+      "ef_percent": 31.323944,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient043",
+      "json_path": "patients/patient043_result.json",
+      "ef_percent": 29.07117,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient044",
+      "json_path": "patients/patient044_result.json",
+      "ef_percent": 37.928646,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient045",
+      "json_path": "patients/patient045_result.json",
+      "ef_percent": 27.624429,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient046",
+      "json_path": "patients/patient046_result.json",
+      "ef_percent": 42.078611,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient047",
+      "json_path": "patients/patient047_result.json",
+      "ef_percent": 16.217733,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient048",
+      "json_path": "patients/patient048_result.json",
+      "ef_percent": 28.75736,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient049",
+      "json_path": "patients/patient049_result.json",
+      "ef_percent": 21.535064,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient050",
+      "json_path": "patients/patient050_result.json",
+      "ef_percent": 16.460566,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient051",
+      "json_path": "patients/patient051_result.json",
+      "ef_percent": 37.900223,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient052",
+      "json_path": "patients/patient052_result.json",
+      "ef_percent": 34.491701,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient053",
+      "json_path": "patients/patient053_result.json",
+      "ef_percent": 25.915624,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient054",
+      "json_path": "patients/patient054_result.json",
+      "ef_percent": 29.826126,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient055",
+      "json_path": "patients/patient055_result.json",
+      "ef_percent": 32.255639,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient056",
+      "json_path": "patients/patient056_result.json",
+      "ef_percent": 35.996016,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient057",
+      "json_path": "patients/patient057_result.json",
+      "ef_percent": 19.532512,
+      "error_flag": "low",
+      "has_crop_risk": true
+    },
+    {
+      "patient_id": "patient058",
+      "json_path": "patients/patient058_result.json",
+      "ef_percent": 30.88685,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient059",
+      "json_path": "patients/patient059_result.json",
+      "ef_percent": 45.104374,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient060",
+      "json_path": "patients/patient060_result.json",
+      "ef_percent": 30.7924,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient061",
+      "json_path": "patients/patient061_result.json",
+      "ef_percent": 53.699897,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient062",
+      "json_path": "patients/patient062_result.json",
+      "ef_percent": 53.906763,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient063",
+      "json_path": "patients/patient063_result.json",
+      "ef_percent": 67.047694,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient064",
+      "json_path": "patients/patient064_result.json",
+      "ef_percent": 53.655625,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient065",
+      "json_path": "patients/patient065_result.json",
+      "ef_percent": 55.481283,
+      "error_flag": "high",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient066",
+      "json_path": "patients/patient066_result.json",
+      "ef_percent": 57.832691,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient067",
+      "json_path": "patients/patient067_result.json",
+      "ef_percent": 60.090361,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient068",
+      "json_path": "patients/patient068_result.json",
+      "ef_percent": 58.445146,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient069",
+      "json_path": "patients/patient069_result.json",
+      "ef_percent": 52.52324,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient070",
+      "json_path": "patients/patient070_result.json",
+      "ef_percent": 56.816917,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient071",
+      "json_path": "patients/patient071_result.json",
+      "ef_percent": 46.997389,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient072",
+      "json_path": "patients/patient072_result.json",
+      "ef_percent": 54.851179,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient073",
+      "json_path": "patients/patient073_result.json",
+      "ef_percent": 62.191425,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient074",
+      "json_path": "patients/patient074_result.json",
+      "ef_percent": 58.413987,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient075",
+      "json_path": "patients/patient075_result.json",
+      "ef_percent": 51.632373,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient076",
+      "json_path": "patients/patient076_result.json",
+      "ef_percent": 58.413987,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient077",
+      "json_path": "patients/patient077_result.json",
+      "ef_percent": 60.764083,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient078",
+      "json_path": "patients/patient078_result.json",
+      "ef_percent": 63.325596,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient079",
+      "json_path": "patients/patient079_result.json",
+      "ef_percent": 57.980162,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient080",
+      "json_path": "patients/patient080_result.json",
+      "ef_percent": 62.296073,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient081",
+      "json_path": "patients/patient081_result.json",
+      "ef_percent": 54.826389,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient082",
+      "json_path": "patients/patient082_result.json",
+      "ef_percent": 53.320197,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient083",
+      "json_path": "patients/patient083_result.json",
+      "ef_percent": 50.673575,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient084",
+      "json_path": "patients/patient084_result.json",
+      "ef_percent": 58.473182,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient085",
+      "json_path": "patients/patient085_result.json",
+      "ef_percent": 55.377985,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient086",
+      "json_path": "patients/patient086_result.json",
+      "ef_percent": 59.853604,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient087",
+      "json_path": "patients/patient087_result.json",
+      "ef_percent": 39.932318,
+      "error_flag": "high",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient088",
+      "json_path": "patients/patient088_result.json",
+      "ef_percent": 43.657544,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient089",
+      "json_path": "patients/patient089_result.json",
+      "ef_percent": 54.255319,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient090",
+      "json_path": "patients/patient090_result.json",
+      "ef_percent": 35.489221,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient091",
+      "json_path": "patients/patient091_result.json",
+      "ef_percent": 45.15128,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient092",
+      "json_path": "patients/patient092_result.json",
+      "ef_percent": 58.923375,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient093",
+      "json_path": "patients/patient093_result.json",
+      "ef_percent": 59.926874,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient094",
+      "json_path": "patients/patient094_result.json",
+      "ef_percent": 39.086294,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient095",
+      "json_path": "patients/patient095_result.json",
+      "ef_percent": 45.79815,
+      "error_flag": "moderate",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient096",
+      "json_path": "patients/patient096_result.json",
+      "ef_percent": 51.591777,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient097",
+      "json_path": "patients/patient097_result.json",
+      "ef_percent": 59.380207,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient098",
+      "json_path": "patients/patient098_result.json",
+      "ef_percent": 51.636024,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient099",
+      "json_path": "patients/patient099_result.json",
+      "ef_percent": 42.350333,
+      "error_flag": "low",
+      "has_crop_risk": false
+    },
+    {
+      "patient_id": "patient100",
+      "json_path": "patients/patient100_result.json",
+      "ef_percent": 58.914366,
+      "error_flag": "low",
+      "has_crop_risk": false
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# Geçici ve işlenmiş veri dosyaları
+processed_tmp/
+prepared_data/
+
+# Ham ve işlenmiş büyük veri klasörleri
+data/raw/
+data/processed/
+
+# Tıbbi görüntüler ve NumPy verileri
+*.nii
+*.nii.gz
+*.npy
+
+# Model ve checkpoint dosyaları
+*.pt
+*.pth
+*.ckpt
+runs/
+checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Gizli ortam değişkenleri
+.env
+
+# Sistem dosyaları
+.DS_Store
+Thumbs.db

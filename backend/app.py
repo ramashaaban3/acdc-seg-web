@@ -9,7 +9,6 @@ from acdc_app.run_pipeline import run_pipeline, PipelinePaths
 from acdc_app.pipeline.inference import InferenceConfig
 from acdc_app.pipeline.data_io import list_patients
 
-
 app = FastAPI(title="ACDC Segmentation API")
 
 app.add_middleware(
@@ -24,13 +23,13 @@ app.add_middleware(
 )
 
 # --- Proje yolları ---
-BACKEND_ROOT = Path(__file__).resolve().parent          # backend/
-DEMO_ROOT    = BACKEND_ROOT / "data" / "demo"
-CKPT_PATH    = BACKEND_ROOT / "models" / "best_resunet2d_acdc.pt"
-OUT_DIR      = BACKEND_ROOT / "outputs"
+BACKEND_ROOT = Path(__file__).resolve().parent  # backend/
+DEMO_ROOT = BACKEND_ROOT / "data" / "demo"
+CKPT_PATH = BACKEND_ROOT / "models" / "best_resunet2d_acdc.pt"
+OUT_DIR = BACKEND_ROOT / "outputs"
 
 paths = PipelinePaths(demo_root=DEMO_ROOT, ckpt_path=CKPT_PATH, out_dir=OUT_DIR)
-cfg   = InferenceConfig(device="cpu", num_classes=4, out_hw=(256, 256))
+cfg = InferenceConfig(device="cpu", num_classes=4, out_hw=(256, 256))
 
 # outputs klasörünü URL'den servis et: /outputs/...
 OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -64,20 +63,29 @@ def patients() -> List[Dict[str, str]]:
     _ensure_ready()
     pids = sorted(list_patients(DEMO_ROOT))
     if not pids:
-        raise HTTPException(status_code=500, detail=f"No patients found under: {DEMO_ROOT}")
-    return [{"patient_id": f"Patient {i+1}", "real_patient_id": pid} for i, pid in enumerate(pids)]
+        raise HTTPException(
+            status_code=500, detail=f"No patients found under: {DEMO_ROOT}"
+        )
+    return [
+        {"patient_id": f"Patient {i+1}", "real_patient_id": pid}
+        for i, pid in enumerate(pids)
+    ]
 
 
 @app.get("/predict")
 def predict(
     request: Request,
-    patient_id: str = Query(..., description="real id: patient101 OR display id: Patient 1"),
+    patient_id: str = Query(
+        ..., description="real id: patient101 OR display id: Patient 1"
+    ),
 ) -> Dict[str, Any]:
     _ensure_ready()
 
     pids = sorted(list_patients(DEMO_ROOT))
     if not pids:
-        raise HTTPException(status_code=500, detail=f"No patients found under: {DEMO_ROOT}")
+        raise HTTPException(
+            status_code=500, detail=f"No patients found under: {DEMO_ROOT}"
+        )
 
     # Display mapping: patient101 -> Patient 1
     display_ids = {pid: f"Patient {i+1}" for i, pid in enumerate(pids)}
@@ -96,7 +104,7 @@ def predict(
         paths=paths,
         cfg=cfg,
         lv_label=3,
-        display_patient_id=display_label,   # UI’da bunu göstereceğiz
+        display_patient_id=display_label,  # UI’da bunu göstereceğiz
     )
 
     # Dosya yolu yerine URL üret (StaticFiles mount’u sayesinde çalışır)

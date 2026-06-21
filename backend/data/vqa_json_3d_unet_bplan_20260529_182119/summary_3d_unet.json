@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "model_name": "3D U-Net",
+  "dataset": {
+    "name": "ACDC",
+    "subset": "training",
+    "n_patients": 100
+  },
+  "volume_correction": {
+    "enabled": true,
+    "method": "effective_spacing_correction"
+  },
+  "aggregate_metrics": {
+    "mean_edv_abs_error_ml": 8.520083,
+    "std_edv_abs_error_ml": 13.376714,
+    "mean_esv_abs_error_ml": 6.291552,
+    "std_esv_abs_error_ml": 11.488875,
+    "mean_ef_abs_error_percent": 2.938442,
+    "std_ef_abs_error_percent": 2.734009
+  },
+  "gt_consistency_ratios": {
+    "edv_original_to_corrected_processed": {
+      "mean": 1.001832,
+      "std": 0.004229,
+      "min": 0.990897,
+      "max": 1.014556
+    },
+    "esv_original_to_corrected_processed": {
+      "mean": 1.001057,
+      "std": 0.006559,
+      "min": 0.98557,
+      "max": 1.023386
+    }
+  },
+  "quality_control": {
+    "crop_risk_count": 2,
+    "qc_distribution": {
+      "OK": 100
+    }
+  }
+}
